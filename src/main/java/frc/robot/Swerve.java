@@ -3,17 +3,14 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix6.hardware.*;
-//import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.AnalogEncoder;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import com.ctre.phoenix6.hardware.*;
+//import com.ctre.phoenix6.hardware.TalonFX;
 
 public class Swerve {
 	public Module front_left, front_right, rear_left, rear_right;

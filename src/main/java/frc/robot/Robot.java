@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -18,13 +17,24 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
  * project.
  */
 public class Robot extends TimedRobot {
-
-  public Swerve drive_swerve = new Swerve(new int[] {1, 2, 0}, new int[] {3, 4, 1}, new int[] {5, 6, 2}, new int[] {7, 8, 3});
-
+  //Defines Controller
   public PS4Controller controller = new PS4Controller(0);
 
-  static final ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+  //Defines all Spark motor controllers  
+  private Spark sparkIntake;
+  private Spark sparkFlyWheel1;
+   private Spark sparkFlyWheel2;
+  private Spark sparkArm;
+  private Spark sparkClimberLeft;
+  private Spark sparkClimberRight;
 
+  //defines limelight 
+  private Limelight limelight = new Limelight(); 
+
+
+  //defines all stuff for swerve 
+  public Swerve drive_swerve = new Swerve(new int[] {1, 2, 0}, new int[] {3, 4, 1}, new int[] {5, 6, 2}, new int[] {7, 8, 3});
+  static final ADXRS450_Gyro gyro = new ADXRS450_Gyro();
   public double drive_velocity = 1.0, turn_velocity = 1.00;
   public double joystick_threshold = 0.05, twist_threshold = 0.05;
 
@@ -36,12 +46,23 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    //Sets up SparkMaxs
+    sparkIntake = new Spark(9, 0);
+    sparkFlyWheel1 = new Spark(10, 0);
+    sparkFlyWheel2 = new Spark(11, 0);
+    sparkArm = new Spark(12, 0);
+    sparkClimberRight = new Spark(13, 1);
+    sparkClimberLeft = new Spark(14, 1);
+
+
     Shuffleboard.getTab("te").add("gyro", gyro);
     gyro.calibrate();
   }
 
   @Override
   public void robotPeriodic() {
+
+
     if (encoderEntry.getBoolean(false)) {
       drive_swerve.reset();
       drive_swerve.update();
@@ -62,6 +83,22 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    
+  
+
+     if (controller.getRawButton(5)) {
+      limelight.trackAprilTag(drive_swerve);
+    } else {
+
+    sparkIntake.controlWithButton(2); // Assuming button 1 controls the motor
+    sparkFlyWheel1.controlWithButton(3);
+    sparkFlyWheel2.controlWithButton(3);
+    sparkArm.controlWithButton(4);
+    sparkClimberRight.controlWithJoystick();
+    sparkClimberLeft.controlWithJoystick();
+
+
+
     double[] angles = {45, -45, -45, 45}; //{45, -45, -45, 45};
     double[] speeds = {0, 0, 0, 0};
 
@@ -153,6 +190,7 @@ public class Robot extends TimedRobot {
     if (controller.getRawButton(1)) {
       gyro.calibrate();
     }
+  }
   }
 
   @Override
