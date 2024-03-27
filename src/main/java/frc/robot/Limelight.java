@@ -33,7 +33,7 @@ public class Limelight {
             if (i < 2) angles[i] = rotationAdjustment; // Modules 0 & 1
             else angles[i] = -rotationAdjustment; // Modules 2 & 3
         }
-        //drive_swerve.setHeadings(angles);
+        drive_swerve.setHeadings(angles);
     }
 }
 

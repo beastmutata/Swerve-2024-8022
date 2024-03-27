@@ -4,10 +4,19 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkMax;
+
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+//import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
@@ -18,15 +27,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
   //Defines Controller
-  public PS4Controller controller = new PS4Controller(0);
+  public PS5Controller controller = new PS5Controller(0);
 
+
+  static final CANSparkMax SRXFlyWheel1 = new CANSparkMax(11, CANSparkLowLevel.MotorType.kBrushed);
+  static final WPI_VictorSPX sparkFlyWheel2 = new WPI_VictorSPX(9);
+  static final MotorControllerGroup FlywheelGroup = new MotorControllerGroup(SRXFlyWheel1, sparkFlyWheel2);
   //Defines all Spark motor controllers  
-  private Spark sparkIntake;
-  private Spark sparkFlyWheel1;
-   private Spark sparkFlyWheel2;
-  private Spark sparkArm;
-  private Spark sparkClimberLeft;
-  private Spark sparkClimberRight;
+
+  static final CANSparkMax sparkIntake = new CANSparkMax(10, CANSparkLowLevel.MotorType.kBrushed);
+  static final CANSparkMax sparkArm = new CANSparkMax(12, CANSparkLowLevel.MotorType.kBrushed);
+  static final CANSparkMax sparkClimberLeft = new CANSparkMax(13, CANSparkLowLevel.MotorType.kBrushed);
+  static final CANSparkMax sparkClimberRight = new CANSparkMax(14, CANSparkLowLevel.MotorType.kBrushed);
+  static final MotorControllerGroup ClimberGroup = new MotorControllerGroup(sparkClimberLeft, sparkClimberRight);
 
   //defines limelight 
   private Limelight limelight = new Limelight(); 
@@ -47,12 +60,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     //Sets up SparkMaxs
-    sparkIntake = new Spark(9, 0);
-    sparkFlyWheel1 = new Spark(10, 0);
-    sparkFlyWheel2 = new Spark(11, 0);
-    sparkArm = new Spark(12, 0);
-    sparkClimberRight = new Spark(13, 1);
-    sparkClimberLeft = new Spark(14, 1);
+
 
 
     Shuffleboard.getTab("te").add("gyro", gyro);
@@ -79,23 +87,13 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {}
 
-  private static double old_heading = 0;
+  //private static double old_heading = 0;
 
   @Override
   public void teleopPeriodic() {
     
-  
 
-     if (controller.getRawButton(5)) {
-      limelight.trackAprilTag(drive_swerve);
-    } else {
 
-    sparkIntake.controlWithButton(2); // Assuming button 1 controls the motor
-    sparkFlyWheel1.controlWithButton(3);
-    sparkFlyWheel2.controlWithButton(3);
-    sparkArm.controlWithButton(4);
-    sparkClimberRight.controlWithJoystick();
-    sparkClimberLeft.controlWithJoystick();
 
 
 
@@ -104,7 +102,7 @@ public class Robot extends TimedRobot {
 
     double translate_x = Math.abs(controller.getLeftX()) > joystick_threshold ? controller.getLeftX() : 0;
     double translate_y = Math.abs(controller.getLeftY()) > joystick_threshold ? -controller.getLeftY() : 0;
-    double rotation = (Math.abs(controller.getRightX()) > twist_threshold ? controller.getRightX() : 0) * turn_velocity;
+    double rotation = (Math.abs(controller.getRightX()) > twist_threshold ? controller.getRightX() : 0) * -turn_velocity;
     // double right_y = controller.getRightY();
 
     double actual_heading = gyro.getAngle();
@@ -190,8 +188,47 @@ public class Robot extends TimedRobot {
     if (controller.getRawButton(1)) {
       gyro.calibrate();
     }
+
+
+     if (controller.getCrossButton()) {
+      FlywheelGroup.set(1);
+    } else if (controller.getCircleButton()) {
+      FlywheelGroup.set(0);
+    }
+
+    if (controller.getRawButton(11)) {
+      ClimberGroup.set(1);
+    } else if (controller.getRawButton(12)) {
+      ClimberGroup.set(-1);
+    }
+    else {
+      ClimberGroup.set(0);
+    }
+
+
+    if (controller.getR1Button()) {
+      sparkIntake.set(-.50);
+    }
+    else {
+     sparkIntake.set(0);
+    }
+
+
+
+
+     if (controller.getL2Button()) {
+      sparkArm.set(1);
+    } else if (controller.getL1Button()) {
+      sparkArm.set(-1);
+    }
+    else {
+      sparkArm.set(0);
+    }
+
+
   }
-  }
+
+  
 
   @Override
   public void disabledInit() {}

@@ -4,13 +4,16 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+//import com.ctre.phoenix6.hardware.*;
+//import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import com.ctre.phoenix6.hardware.*;
-//import com.ctre.phoenix6.hardware.TalonFX;
 
 public class Swerve {
 	public Module front_left, front_right, rear_left, rear_right;
@@ -55,9 +58,9 @@ public class Swerve {
 
 	public void setSpeeds(double[] speeds) {
 		front_left.spin(speeds[0]);
-		front_right.spin(speeds[1]);
+		front_right.spin(-speeds[1]);
 		rear_left.spin(speeds[2]);
-		rear_right.spin(speeds[3]);
+		rear_right.spin(-speeds[3]);
 	}
 
 	public void calculateAlignment() {
@@ -66,6 +69,17 @@ public class Swerve {
 		rear_left.calculateAlignment();
 		rear_right.calculateAlignment();
 	}
+
+
+Translation2d m_frontLeftLocation = new Translation2d(12.75, -12.75);
+Translation2d m_frontRightLocation = new Translation2d(12.75, 12.75);
+Translation2d m_backLeftLocation = new Translation2d(-12.75, -12.75);
+Translation2d m_backRightLocation = new Translation2d(-12.75, 12.75);
+
+// Creating my kinematics object using the module locations
+SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+  m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
+);
 
 	private static int id = 0;
 
@@ -106,6 +120,7 @@ public class Swerve {
 			meid = id;
 			id++;
 		}
+// kinda maybe breaks things delete if brokey
 
 		public void update() {
 			// SmartDashboard.putNumber("encoderDistance" + meid, rotation_encoder.getDistance());
